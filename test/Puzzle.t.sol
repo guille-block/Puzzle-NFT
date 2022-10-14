@@ -124,4 +124,238 @@ contract NFTTest is DSTest, IStructPuzzle {
         assertEq(puzzle.balanceOf(address(4), 4), 0);
         assertEq(puzzle.balanceOf(address(4), 5), 1);
     }
+
+    function testPuzzle1BatchTransfer () public {
+        address to1 = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4;
+        for(uint8 i=1; i <= 2; i++) {
+            puzzle.mintParts(to1, i);
+        }
+
+        address to2 = address(1);
+        for(uint8 i=3; i <= 4; i++) {
+            puzzle.mintParts(to2, i);
+        }
+
+        
+        uint256[] memory ids = new uint256[](2);
+        ids[0] = 3;
+        ids[1] = 4;
+
+        uint256[] memory amounts = new uint256[](2);
+        amounts[0] = 1;
+        amounts[1] = 1;
+        vm.prank(to2);
+        puzzle.safeBatchTransferFrom(
+            to2,
+            to1,
+            ids,
+            amounts,
+            "0x"
+        );
+        assertEq(puzzle.balanceOf(to1, 5), 1);
+        assertEq(puzzle.balanceOf(to1, 4), 0);
+        assertEq(puzzle.balanceOf(to1, 3), 0);
+        assertEq(puzzle.balanceOf(to1, 2), 0);
+        assertEq(puzzle.balanceOf(to1, 1), 0);
+    }
+
+    function testPuzzle1Transfer () public {
+        address to1 = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4;
+        for(uint8 i=1; i <= 3; i++) {
+            puzzle.mintParts(to1, i);
+        }
+
+        address to2 = address(1);
+        for(uint8 i=4; i <= 4; i++) {
+            puzzle.mintParts(to2, i);
+        }
+        vm.prank(to2);
+        puzzle.safeTransferFrom(
+            to2,
+            to1,
+            uint256(4),
+            uint256(1),
+            "0x"
+        );
+        assertEq(puzzle.balanceOf(to1, 5), 1);
+        assertEq(puzzle.balanceOf(to1, 4), 0);
+        assertEq(puzzle.balanceOf(to1, 3), 0);
+        assertEq(puzzle.balanceOf(to1, 2), 0);
+        assertEq(puzzle.balanceOf(to1, 1), 0);
+    }
+
+    function testPuzzle3BatchTransfer () public {
+        address to1 = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4;
+        for(uint8 i=1; i <= 2; i++) {
+            puzzle.mintParts(to1, i);
+            puzzle.mintParts(to1, i);
+            puzzle.mintParts(to1, i);
+        }
+
+        address to2 = address(1);
+        for(uint8 i=3; i <= 4; i++) {
+            puzzle.mintParts(to2, i);
+            puzzle.mintParts(to2, i);
+            puzzle.mintParts(to2, i);
+        }
+
+        
+        uint256[] memory ids = new uint256[](2);
+        ids[0] = 3;
+        ids[1] = 4;
+
+        uint256[] memory amounts = new uint256[](2);
+        amounts[0] = 3;
+        amounts[1] = 3;
+        vm.prank(to2);
+        puzzle.safeBatchTransferFrom(
+            to2,
+            to1,
+            ids,
+            amounts,
+            "0x"
+        );
+        assertEq(puzzle.balanceOf(to1, 5), 3);
+        assertEq(puzzle.balanceOf(to1, 4), 0);
+        assertEq(puzzle.balanceOf(to1, 3), 0);
+        assertEq(puzzle.balanceOf(to1, 2), 0);
+        assertEq(puzzle.balanceOf(to1, 1), 0);
+    }
+
+    // @notice Test safeTransferFrom for 3 transfered parts to user that has other 3 parts
+    // @dev Check assertions on minted different than 3 puzzles, and pieces to go down to 0
+    function testPuzzle3Transfer () public {
+        address to1 = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4;
+        for(uint8 i=1; i <= 3; i++) {
+            puzzle.mintParts(to1, i);
+            puzzle.mintParts(to1, i);
+            puzzle.mintParts(to1, i);
+        }
+
+        address to2 = address(1);
+        for(uint8 i=4; i <= 4; i++) {
+            puzzle.mintParts(to2, i);
+            puzzle.mintParts(to2, i);
+            puzzle.mintParts(to2, i);
+        }
+        vm.prank(to2);
+        puzzle.safeTransferFrom(
+            to2,
+            to1,
+            uint256(4),
+            uint256(3),
+            "0x"
+        );
+        assertEq(puzzle.balanceOf(to1, 5), 3);
+        assertEq(puzzle.balanceOf(to1, 4), 0);
+        assertEq(puzzle.balanceOf(to1, 3), 0);
+        assertEq(puzzle.balanceOf(to1, 2), 0);
+        assertEq(puzzle.balanceOf(to1, 1), 0);
+    }
+
+    function testPuzzle2BatchTransfer1Id4Remaining () public {
+        address to1 = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4;
+        for(uint8 i=1; i <= 2; i++) {
+            puzzle.mintParts(to1, i);
+            puzzle.mintParts(to1, i);
+            puzzle.mintParts(to1, i);
+        }
+
+        address to2 = address(1);
+        for(uint8 i=3; i <= 4; i++) {
+            puzzle.mintParts(to2, i);
+            puzzle.mintParts(to2, i);
+            puzzle.mintParts(to2, i);
+        }
+
+        
+        uint256[] memory ids = new uint256[](2);
+        ids[0] = 3;
+        ids[1] = 4;
+
+        uint256[] memory amounts = new uint256[](2);
+        amounts[0] = 3;
+        amounts[1] = 2;
+        vm.prank(to2);
+        puzzle.safeBatchTransferFrom(
+            to2,
+            to1,
+            ids,
+            amounts,
+            "0x"
+        );
+        assertEq(puzzle.balanceOf(to1, 5), 2);
+        assertEq(puzzle.balanceOf(to1, 4), 0);
+        assertEq(puzzle.balanceOf(to2, 4), 1);
+        assertEq(puzzle.balanceOf(to1, 3), 1);
+        assertEq(puzzle.balanceOf(to1, 2), 1);
+        assertEq(puzzle.balanceOf(to1, 1), 1);
+    }
+
+    function testPuzzle2Transfer1Remining () public {
+        address to1 = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4;
+        for(uint8 i=1; i <= 3; i++) {
+            puzzle.mintParts(to1, i);
+            puzzle.mintParts(to1, i);
+            puzzle.mintParts(to1, i);
+        }
+
+        address to2 = address(1);
+        for(uint8 i=4; i <= 4; i++) {
+            puzzle.mintParts(to2, i);
+            puzzle.mintParts(to2, i);
+            puzzle.mintParts(to2, i);
+        }
+        vm.prank(to2);
+        puzzle.safeTransferFrom(
+            to2,
+            to1,
+            uint256(4),
+            uint256(2),
+            "0x"
+        );
+        assertEq(puzzle.balanceOf(to1, 5), 2);
+        assertEq(puzzle.balanceOf(to1, 4), 0);
+        assertEq(puzzle.balanceOf(to2, 4), 1);
+        assertEq(puzzle.balanceOf(to1, 3), 1);
+        assertEq(puzzle.balanceOf(to1, 2), 1);
+        assertEq(puzzle.balanceOf(to1, 1), 1);
+    }
+
+    function testPuzzle1EachBatchTransfer1Remining () public {
+        address to1 = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4;
+        for(uint8 i=1; i <= 2; i++) {
+            puzzle.mintParts(to1, i);
+            puzzle.mintParts(to1, i);
+        }
+
+        address to2 = address(1);
+        for(uint8 i=3; i <= 4; i++) {
+            puzzle.mintParts(to2, i);
+            puzzle.mintParts(to2, i);
+        }
+
+        
+        uint256[] memory ids = new uint256[](2);
+        ids[0] = 3;
+        ids[1] = 4;
+
+        uint256[] memory amounts = new uint256[](2);
+        amounts[0] = 1;
+        amounts[1] = 1;
+        vm.prank(to2);
+        puzzle.safeBatchTransferFrom(
+            to2,
+            to1,
+            ids,
+            amounts,
+            "0x"
+        );
+        assertEq(puzzle.balanceOf(to1, 5), 1);
+        assertEq(puzzle.balanceOf(to2, 4), 1);
+        assertEq(puzzle.balanceOf(to2, 3), 1);
+        assertEq(puzzle.balanceOf(to1, 2), 1);
+        assertEq(puzzle.balanceOf(to1, 1), 1);
+    }
+
 }
