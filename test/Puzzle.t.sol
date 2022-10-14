@@ -49,4 +49,79 @@ contract NFTTest is DSTest, IStructPuzzle {
         puzzle.mintPartsBatch(minta);
     }
 
+    function testFailMintPartsBatchOverId() public {
+        Mint[] memory minti = new Mint[](6);
+        for(uint160 i = 0; i < minti.length; ++i) {
+            uint160 num = i+1;
+            minti[i] = Mint(address(num), num);
+        }
+        puzzle.mintPartsBatch(minti);
+    }
+
+    function testMintUserPartsAndLeft() public {
+        for(uint8 i; i < 5; i++) {
+            puzzle.mintParts(address(1), 1);
+        }
+        
+         assertEq(puzzle.userToPartsToAmounts(address(1), 1), 5);
+         assertEq(puzzle.idToAmountsReserve(1), 0);
+    }
+    
+    function testMinted4Parts() public {
+        address to = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4;
+        for(uint8 i=1; i <= 3; i++) {
+            puzzle.mintParts(to, i);
+            assertEq(puzzle.balanceOf(to, i), 1);
+        }
+    }
+
+    function testPuzzleMint () public {
+        address to = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4;
+        for(uint8 i=1; i <= 4; i++) {
+            puzzle.mintParts(to, i);
+        }
+        assertEq(puzzle.balanceOf(to, 5), 1);
+        assertEq(puzzle.balanceOf(to, 1), 0);
+        assertEq(puzzle.balanceOf(to, 2), 0);
+        assertEq(puzzle.balanceOf(to, 3), 0);
+        assertEq(puzzle.balanceOf(to, 4), 0);
+    }
+
+    function testMintPartsBatch() public {
+        Mint[] memory minta = new Mint[](4);
+        for(uint160 i = 0; i < minta.length; ++i) {
+            uint160 num = i+1;
+            minta[i] = Mint(address(num), num);
+        }
+        puzzle.mintPartsBatch(minta);
+        assertEq(puzzle.balanceOf(address(1), 1), 1);
+        assertEq(puzzle.balanceOf(address(2), 2), 1);
+        assertEq(puzzle.balanceOf(address(3), 3), 1);
+        assertEq(puzzle.balanceOf(address(4), 4), 1);
+    }
+    
+    function testMintPartsBatchWinningPuzzle() public {
+        address to2 = address(4);
+        for(uint8 i=1; i <= 3; i++) {
+            puzzle.mintParts(to2, i);
+        }
+        assertEq(puzzle.balanceOf(address(4), 1), 1);
+        assertEq(puzzle.balanceOf(address(4), 2), 1);
+        assertEq(puzzle.balanceOf(address(4), 3), 1);
+
+        Mint[] memory minta = new Mint[](4);
+        for(uint160 i = 0; i < minta.length; ++i) {
+            uint160 num = i+1;
+            minta[i] = Mint(address(num), num);
+        }
+        puzzle.mintPartsBatch(minta);
+        assertEq(puzzle.balanceOf(address(1), 1), 1);
+        assertEq(puzzle.balanceOf(address(2), 2), 1);
+        assertEq(puzzle.balanceOf(address(3), 3), 1);
+        assertEq(puzzle.balanceOf(address(4), 1), 0);
+        assertEq(puzzle.balanceOf(address(4), 2), 0);
+        assertEq(puzzle.balanceOf(address(4), 3), 0);
+        assertEq(puzzle.balanceOf(address(4), 4), 0);
+        assertEq(puzzle.balanceOf(address(4), 5), 1);
+    }
 }
